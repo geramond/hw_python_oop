@@ -1,13 +1,11 @@
 import datetime as dt
-import math
 
-class Record:
-    date_now = dt.date.today()        
-    def __init__(self, amount, comment, date=date_now):
+class Record:            
+    def __init__(self, amount, comment, date=dt.date.today()):
         self.amount = amount
         self.comment = str(comment)
 
-        if isinstance(date, dt.date) == False:
+        if not isinstance(date, dt.date):
             date_format = "%d.%m.%Y"
             self.date = dt.datetime.strptime(date, date_format).date()
         else:    
@@ -21,114 +19,56 @@ class Calculator:
     def add_record(self, record):
         self.records.append(record)
 
-    def get_today_stats(self):
+    def get_stats(self, days_amount):
         result = 0
-        date_now = dt.date.today()
+        delta = dt.timedelta(days=days_amount)
 
         for record in self.records:
-            if record.date == date_now:
+            if dt.date.today() - delta < record.date <= dt.date.today():
                 result += record.amount
-        #return float(result)       
         return result
 
-    def get_week_stats(self):
-        result = 0
-        delta = dt.timedelta(days=7)
-        date_now = dt.date.today()
+    def get_today_stats(self):              
+        return self.get_stats(1)
 
-        for record in self.records:
-            #if record.date in range(date_now - delta, date_now):
-            if record.date > date_now - delta and record.date <= date_now:            
-                result += record.amount
-        #return float(result)
-        return result
+    def get_week_stats(self):                
+        return self.get_stats(7)
 
 class CashCalculator(Calculator):
     USD_RATE = 68.61
     EURO_RATE = 77.75
 
-    #def __init__(self, limit):
-    #    super().__init__(limit)        
-
-    def get_today_cash_remained(self, currency):
-        spent = super().get_today_stats()
+    def get_today_cash_remained(self, currency):        
+        spent = self.get_today_stats()
         remained = self.limit - spent
-
-        """
-        if currency == 'rub':
-            rub = round(remained, 2)
-            currency_str = f"{rub} руб"
-        elif currency == 'usd':
-            usd = round(remained / self.USD_RATE, 2)
-            currency_str = f"{usd} USD"
-        elif currency == 'eur':
-            eur = round(remained / self.EUR_RATE, 2)
-            currency_str = f"{eur} Euro"
-        else:
-            raise ValueError("Unknown currency")
-
+        
+        currency_switch = {
+            'rub': f"{round(abs(remained), 2)} руб",
+            'usd': f"{round(abs(remained) / self.USD_RATE, 2)} USD",
+            'eur': f"{round(abs(remained) / self.EURO_RATE, 2)} Euro"
+        }
+        
         if remained == 0:
-            return (f"Денег нет, держись")            
-        elif remained < 0:
-            return (f"Денег нет, держись: твой долг - {math.fabs(remained)}")
-        elif remained > 0:
-            return (f"На сегодня осталось {currency_str}")
+            return f"Денег нет, держись"        
+        elif remained < 0:            
+            return (f"Денег нет, держись: твой долг - {currency_switch[currency]}")
         else:
-            raise ValueError("Unknown error, check code")
-        """
-
-        if remained == 0:
-            return (f"Денег нет, держись")            
-        elif remained < 0:
-            remained = math.fabs(remained)
-            if currency == 'rub':
-                rub = round(remained, 2)
-                currency_str = f"{rub} руб"
-            elif currency == 'usd':
-                usd = round(remained / self.USD_RATE, 2)
-                currency_str = f"{usd} USD"
-            elif currency == 'eur':
-                eur = round(remained / self.EURO_RATE, 2)
-                currency_str = f"{eur} Euro"
-            else:
-                raise ValueError("Unknown currency")
-            return (f"Денег нет, держись: твой долг - {currency_str}")            
-        elif remained > 0:
-            if currency == 'rub':
-                rub = round(remained, 2)
-                currency_str = f"{rub} руб"
-            elif currency == 'usd':
-                usd = round(remained / self.USD_RATE, 2)
-                currency_str = f"{usd} USD"
-            elif currency == 'eur':
-                eur = round(remained / self.EURO_RATE, 2)
-                currency_str = f"{eur} Euro"
-            else:
-                raise ValueError("Unknown currency")
-            return (f"На сегодня осталось {currency_str}")
-        else:
-            raise ValueError("Unknown error, check code")
+            return (f"На сегодня осталось {currency_switch[currency]}")
 
 class CaloriesCalculator(Calculator):
-    #def __init__(self, limit):
-    #    super().__init__(limit)
 
     def get_calories_remained(self):
-        spent = super().get_today_stats()
+        spent = self.get_today_stats()
         remained = self.limit - spent
 
         if remained > 0:
             return (f'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более {remained} кКал')
-        elif remained <= 0:
-            return (f'Хватит есть!')
         else:
-            raise ValueError('Unknown error, check code')
+            return (f'Хватит есть!')
 
 
-
-if __name__ == "__main__":
-    cash_calculator = CashCalculator(1000)
-    cash_calculator.add_record(Record(amount=500, comment="кофе"))
-    cash_calculator.add_record(Record(amount=5000, comment="Сереге за обед"))
-    cash_calculator.add_record(Record(amount=3000, comment="бар в Танин др", date="08.11.2019"))
-    print(cash_calculator.get_today_cash_remained('rub'))
+cash_calculator = CashCalculator(1000.567)
+cash_calculator.add_record(Record(amount=500, comment="кофе"))
+cash_calculator.add_record(Record(amount=100, comment="Сереге за обед"))
+cash_calculator.add_record(Record(amount=3000, comment="бар в Танин др", date="08.11.2019"))
+print(cash_calculator.get_today_cash_remained('rub'))
