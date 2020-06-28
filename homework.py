@@ -20,11 +20,12 @@ class Calculator:
         self.records.append(record)
 
     def get_stats(self, days_amount):
-        result = 0
-        delta = dt.timedelta(days=days_amount)
+        result = 0        
+        past_date = dt.date.today() - dt.timedelta(days=days_amount)
+        today = dt.date.today()
 
         for record in self.records:
-            if dt.date.today() - delta < record.date <= dt.date.today():
+            if past_date < record.date <= today:
                 result += record.amount
         return result
 
@@ -42,18 +43,20 @@ class CashCalculator(Calculator):
         spent = self.get_today_stats()
         remained = self.limit - spent
         
-        currency_switch = {
-            'rub': f"{round(abs(remained), 2)} руб",
-            'usd': f"{round(abs(remained) / self.USD_RATE, 2)} USD",
-            'eur': f"{round(abs(remained) / self.EURO_RATE, 2)} Euro"
-        }
-        
         if remained == 0:
-            return f"Денег нет, держись"        
-        elif remained < 0:            
-            return (f"Денег нет, держись: твой долг - {currency_switch[currency]}")
-        else:
-            return (f"На сегодня осталось {currency_switch[currency]}")
+            return f"Денег нет, держись"
+
+        currency_switch = {
+            'rub' : [1, "руб"],
+            'usd' : [self.USD_RATE, "USD"],
+            'eur' : [self.EURO_RATE, "Euro"]
+        }
+        currency_str = f"{round(abs(remained) / currency_switch[currency][0], 2)} {currency_switch[currency][1]}"
+               
+        if remained < 0:            
+            return (f"Денег нет, держись: твой долг - {currency_str}")
+
+        return (f"На сегодня осталось {currency_str}")
 
 class CaloriesCalculator(Calculator):
 
@@ -63,8 +66,8 @@ class CaloriesCalculator(Calculator):
 
         if remained > 0:
             return (f'Сегодня можно съесть что-нибудь ещё, но с общей калорийностью не более {remained} кКал')
-        else:
-            return (f'Хватит есть!')
+
+        return (f'Хватит есть!')
 
 
 cash_calculator = CashCalculator(1000.567)
