@@ -36,8 +36,9 @@ class Calculator:
         return self.get_stats(7)
 
 class CashCalculator(Calculator):
+    RUB_RATE = 1.0
     USD_RATE = 68.61
-    EURO_RATE = 77.75
+    EURO_RATE = 77.75    
 
     def get_today_cash_remained(self, currency):        
         spent = self.get_today_stats()
@@ -47,9 +48,9 @@ class CashCalculator(Calculator):
             return f"Денег нет, держись"
 
         currency_switch = {
-            'rub' : [1, "руб"],
-            'usd' : [self.USD_RATE, "USD"],
-            'eur' : [self.EURO_RATE, "Euro"]
+            'rub' : (self.RUB_RATE, "руб"),
+            'usd' : (self.USD_RATE, "USD"),
+            'eur' : (self.EURO_RATE, "Euro")
         }
         currency_str = f"{round(abs(remained) / currency_switch[currency][0], 2)} {currency_switch[currency][1]}"
                
@@ -69,9 +70,9 @@ class CaloriesCalculator(Calculator):
 
         return (f'Хватит есть!')
 
-
-cash_calculator = CashCalculator(1000.567)
-cash_calculator.add_record(Record(amount=500, comment="кофе"))
-cash_calculator.add_record(Record(amount=100, comment="Сереге за обед"))
-cash_calculator.add_record(Record(amount=3000, comment="бар в Танин др", date="08.11.2019"))
-print(cash_calculator.get_today_cash_remained('rub'))
+if __name__ == "__main__":
+    cash_calculator = CashCalculator(1000.567)
+    cash_calculator.add_record(Record(amount=500, comment="кофе"))
+    cash_calculator.add_record(Record(amount=100, comment="Сереге за обед"))
+    cash_calculator.add_record(Record(amount=3000, comment="бар в Танин др", date="08.11.2019"))
+    print(cash_calculator.get_today_cash_remained('rub'))
