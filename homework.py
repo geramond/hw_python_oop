@@ -8,9 +8,9 @@ class Record:
         self.amount = amount
         self.comment = str(comment)
 
-        if not isinstance(date, dt.date):            
+        if not isinstance(date, dt.date):
             self.date = dt.datetime.strptime(date, self.DATE_FORMAT).date()
-        else:    
+        else:
             self.date = date
 
 
@@ -23,7 +23,7 @@ class Calculator:
         self.records.append(record)
 
     def get_stats(self, days_amount):
-        result = 0        
+        result = 0
         past_date = dt.date.today() - dt.timedelta(days=days_amount)
         today = dt.date.today()
 
@@ -35,32 +35,34 @@ class Calculator:
     def get_today_stats(self):
         return self.get_stats(1)
 
-    def get_week_stats(self):                
+    def get_week_stats(self):
         return self.get_stats(7)
+
 
 class CashCalculator(Calculator):
     RUB_RATE = 1.0
     USD_RATE = 68.61
-    EURO_RATE = 77.75    
+    EURO_RATE = 77.75
 
-    def get_today_cash_remained(self, currency):        
+    def get_today_cash_remained(self, currency):
         spent = self.get_today_stats()
         remained = self.limit - spent
-        
+
         if remained == 0:
             return f"Денег нет, держись"
 
         currency_switch = {
-            'rub' : (self.RUB_RATE, "руб"),
-            'usd' : (self.USD_RATE, "USD"),
-            'eur' : (self.EURO_RATE, "Euro")
+            'rub': (self.RUB_RATE, "руб"),
+            'usd': (self.USD_RATE, "USD"),
+            'eur': (self.EURO_RATE, "Euro")
         }
         currency_str = f"{round(abs(remained) / currency_switch[currency][0], 2)} {currency_switch[currency][1]}"
-               
-        if remained < 0:            
+
+        if remained < 0:
             return (f"Денег нет, держись: твой долг - {currency_str}")
 
         return (f"На сегодня осталось {currency_str}")
+
 
 class CaloriesCalculator(Calculator):
 
