@@ -1,15 +1,18 @@
 import datetime as dt
 
-class Record:            
+
+class Record:
+    DATE_FORMAT = "%d.%m.%Y"
+
     def __init__(self, amount, comment, date=dt.date.today()):
         self.amount = amount
         self.comment = str(comment)
 
-        if not isinstance(date, dt.date):
-            date_format = "%d.%m.%Y"
-            self.date = dt.datetime.strptime(date, date_format).date()
+        if not isinstance(date, dt.date):            
+            self.date = dt.datetime.strptime(date, self.DATE_FORMAT).date()
         else:    
             self.date = date
+
 
 class Calculator:
     def __init__(self, limit):
@@ -29,7 +32,7 @@ class Calculator:
                 result += record.amount
         return result
 
-    def get_today_stats(self):              
+    def get_today_stats(self):
         return self.get_stats(1)
 
     def get_week_stats(self):                
