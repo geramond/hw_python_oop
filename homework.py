@@ -80,4 +80,4 @@ if __name__ == "__main__":
     cash_calculator.add_record(Record(amount=500, comment="кофе"))
     cash_calculator.add_record(Record(amount=100, comment="Сереге за обед"))
     cash_calculator.add_record(Record(amount=3000, comment="бар в Танин др", date="08.11.2019"))
-    print(cash_calculator.get_today_cash_remained('rub'))
+    print(cash_calculator.get_today_cash_remained('rub')) 
